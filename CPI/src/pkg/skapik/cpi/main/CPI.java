@@ -16,6 +16,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.FileTime;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.awt.AWTException;
 import java.awt.Cursor;
 import java.awt.GraphicsEnvironment;
@@ -48,6 +51,7 @@ public class CPI{
     private static Point center_on_screen;
     public static Rectangle screenSize;
     public static JFrame frame;
+    public static GLCanvas canvas;
 
 	private BufferedImage cursorImg;
 	private Cursor blankCursor;
@@ -55,14 +59,15 @@ public class CPI{
 	// Module
 	private Camera camera;
 	private Robot robot_controller;
-    private JFrame game_frame;
-	private FileTime last_command;
+    private JFrame module_frame;
+    private Renderer renderer;
 	private boolean dragging;
+	private XML_Reader xml_reader;
     
 	public CPI(int w, int h, JFrame frame) {
 		width = w;
 	    height = h;
-		game_frame = frame;
+		module_frame = frame;
 		dragging = false;
 		cursorImg = new BufferedImage(16, 16, BufferedImage.TYPE_INT_ARGB);
 	    blankCursor = Toolkit.getDefaultToolkit().createCustomCursor((Image)cursorImg, new Point(0, 0), "blank cursor");
@@ -70,6 +75,7 @@ public class CPI{
 
 	public void init(Renderer rndr){ // Initialization - called when you initially want to initialize the initial values. :-P
 		this.camera = new Camera();
+		this.renderer = rndr;
 		try {
 			this.robot_controller = new Robot(); // Robot pro systemove rizeni mysi
 			//camera.init_view_coords(center.x,center.y);
@@ -87,12 +93,8 @@ public class CPI{
 	    //width = 1280;// screenSize.width; //(int) screenSize.getWidth();
 	    //height = 762;// screenSize.height; //(int) screenSize.getHeight();
 	    
-	    // neviditelny kurzor 
-	    BufferedImage cursorImg = new BufferedImage(16, 16, BufferedImage.TYPE_INT_ARGB);
-	    Cursor blankCursor = Toolkit.getDefaultToolkit().createCustomCursor((Image)cursorImg, new Point(0, 0), "blank cursor");
-	    
 	    // Nove okno
-	    GLCanvas canvas = new GLCanvas(new GLCapabilities(GLProfile.get(GLProfile.GL2)));
+	    canvas = new GLCanvas(new GLCapabilities(GLProfile.get(GLProfile.GL2)));
 	    frame = new JFrame("CPI Module");
 	    frame.setAlwaysOnTop(false);
 	    frame.setSize(screenSize.width, screenSize.height);
@@ -116,10 +118,10 @@ public class CPI{
 	    CPI module = new CPI(screenSize.width, screenSize.height, frame);
 	    Renderer renderer = new Renderer(module);
 	    canvas.addGLEventListener(renderer);
-	    canvas.addKeyListener((java.awt.event.KeyListener) new MyKeyListener(module));
-	    canvas.addMouseListener(new MyMouseListener(module));
-	    canvas.addMouseWheelListener(new MyMouseWheelListener(module));
-	    canvas.addMouseMotionListener(new MyMouseListener(module));
+	    canvas.addKeyListener((java.awt.event.KeyListener) new Key_Listener(module));
+	    canvas.addMouseListener(new Mouse_Listener(module));
+	    canvas.addMouseWheelListener(new Mouse_Listener(module));
+	    canvas.addMouseMotionListener(new Mouse_Listener(module));
 	    canvas.requestFocus();
 	    frame.addWindowListener(new WindowAdapter() {
 	        public void windowClosing(WindowEvent e) {
