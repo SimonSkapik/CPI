@@ -57,21 +57,22 @@ public class CPI{
 	private Robot robot_controller;
     private JFrame game_frame;
 	private FileTime last_command;
+	private boolean dragging;
     
 	public CPI(int w, int h, JFrame frame) {
 		width = w;
 	    height = h;
 		game_frame = frame;
-	    cursorImg = new BufferedImage(16, 16, BufferedImage.TYPE_INT_ARGB);
+		dragging = false;
+		cursorImg = new BufferedImage(16, 16, BufferedImage.TYPE_INT_ARGB);
 	    blankCursor = Toolkit.getDefaultToolkit().createCustomCursor((Image)cursorImg, new Point(0, 0), "blank cursor");
 	}
 
-	public void init(){ // Initialization - called when you initially want to initialize the game!
-		this.camera = new Camera(); // YOU ARE HERE
+	public void init(Renderer rndr){ // Initialization - called when you initially want to initialize the initial values. :-P
+		this.camera = new Camera();
 		try {
 			this.robot_controller = new Robot(); // Robot pro systemove rizeni mysi
-			robot_controller.mouseMove(center_on_screen.x,center_on_screen.y); // Sup krysu na stred
-			camera.init_view_coords(center.x,center.y);
+			//camera.init_view_coords(center.x,center.y);
 		} catch (AWTException e) {
 			e.printStackTrace(); // OOOOPS
 		}
@@ -107,7 +108,7 @@ public class CPI{
 	    // AAAAAAND OPEEEEEN!!!
 	    frame.setVisible(true);
 	    
-	    // stred obrazovky
+	    // stred obrazovky jen pro inicializaci na hodnotach nezalezi
 	    center = new Point((screenSize.width/2),(screenSize.height/2));
 	    center_on_screen = new Point((canvas.getLocationOnScreen().x + screenSize.width/2),(canvas.getLocationOnScreen().y + screenSize.height/2));
 	    
@@ -169,36 +170,51 @@ public class CPI{
 	}
 
 	public void mouse_dragged(int button, int x, int y) {
-		//this.mouse_moved(x,y);
-		if(x != center.x || y != center.y){
-			camera.Look(x,y);
+		if(!dragging){
+			center.setLocation(x, y);
+			camera.init_view_coords(center.x,center.y);
+		    center_on_screen.setLocation((canvas.getLocationOnScreen().x + center.x),(canvas.getLocationOnScreen().y + center.y));
+			frame.getContentPane().setCursor(blankCursor);
+			dragging = true;
+		}else{
+			if(button == 1){
+				if(x != center.x || y != center.y){
+					camera.Rotate(x,y);
+				}
+				robot_controller.mouseMove(center_on_screen.x,center_on_screen.y);
+			}else if(button == 2){
+				if(x != center.x || y != center.y){
+					camera.Look(x,y);
+				}
+				robot_controller.mouseMove(center_on_screen.x,center_on_screen.y);
+			}else if(button == 3){
+				if(x != center.x || y != center.y){
+					camera.Move(x,y);
+				}
+				robot_controller.mouseMove(center_on_screen.x,center_on_screen.y);
+			}
 		}
-		robot_controller.mouseMove(center_on_screen.x,center_on_screen.y);
 	}
 
 	public void mouse_moved(int x, int y) {
-		
-		/*if(player.is_in_inventory()){
-			game_frame.getContentPane().setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
-			player.inventory_move(x,y);
-		}else{	
-			game_frame.getContentPane().setCursor(blankCursor);
-			if(x != center.x || y != center.y){
-				player.Look(x,y);
-			}
-			robot_controller.mouseMove(center_on_screen.x,center_on_screen.y);
-		}*/
+
 	}
 	
-	public Camera get_camera() { // Do I seriously need to describe this one?
+	public Camera get_camera() {
 		return this.camera;
 	}
 
 	public void mouse_clicked(MouseEvent m) {
 		//this.camera.Click(m);
 	}
-
-	public void mouse_wheel_moved(MouseWheelEvent mwe) { // Mouse WHEEEEEEEE    L
-		this.camera.Scroll(mwe.getWheelRotation());
+	
+	public void mouse_released(MouseEvent m) {
+		dragging = false;
+		frame.getContentPane().setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
 	}
+	
+	public void mouse_wheel_moved(MouseWheelEvent mwe) {
+		this.camera.Scroll(-mwe.getWheelRotation());
+	}
+
 }
