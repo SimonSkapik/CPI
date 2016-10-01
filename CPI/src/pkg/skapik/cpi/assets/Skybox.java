@@ -59,7 +59,7 @@ public class Skybox{
  		gl.glVertexPointer(3, GL2.GL_FLOAT, 0, vertices);
  		gl.glTexCoordPointer(2, GL2.GL_FLOAT, 0, coords);
  		// draw a cube
- 		gl.glMaterialfv(GL2.GL_FRONT_AND_BACK, GL2.GL_AMBIENT_AND_DIFFUSE, Custom_Draw.float_color(Custom_Draw.COLOR_GREEN), 0);
+ 		gl.glMaterialfv(GL2.GL_FRONT_AND_BACK, GL2.GL_AMBIENT_AND_DIFFUSE, Custom_Draw.float_color(Custom_Draw.COLOR_LIGHTBLUE), 0);
  		gl.glDrawElements(GL2.GL_QUADS, 24, GL2.GL_UNSIGNED_INT, indices);
  		
  		// deactivate vertex arrays after drawing

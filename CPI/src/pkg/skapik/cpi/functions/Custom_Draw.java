@@ -15,6 +15,7 @@ public class Custom_Draw {
 	public static int COLOR_GREEN = 4;
 	public static int COLOR_GREY = 5;
 	public static int COLOR_LIGHT = 6;
+	public static int COLOR_LIGHTBLUE = 7;
 	
 	public static boolean is_black(double[] pixel) {
 		int counter = 0;
@@ -58,8 +59,14 @@ public class Custom_Draw {
      
     	gl.glEnd();
     }
-    
+    public static void drawQuad(GL2 gl){
+    	drawQuad(gl, 1f);
+    }
     public static void drawQuad(GL2 gl, float size){
+    	drawQuad(gl, size, Custom_Draw.float_color(COLOR_WHITE));
+    }
+    		
+    public static void drawQuad(GL2 gl, float size, float[] color){
     	gl.glPushMatrix();
     	gl.glEnableClientState(GL2.GL_VERTEX_ARRAY);
     	gl.glDisable(GL2.GL_TEXTURE_2D);
@@ -79,7 +86,7 @@ public class Custom_Draw {
  		gl.glVertexPointer(2, GL2.GL_FLOAT, 0, vertices);
  		// draw a cube
  		gl.glScaled(size, size, 1);
- 		gl.glMaterialfv(GL2.GL_FRONT_AND_BACK, GL2.GL_AMBIENT_AND_DIFFUSE, Custom_Draw.float_color(COLOR_WHITE), 0);
+ 		gl.glMaterialfv(GL2.GL_FRONT_AND_BACK, GL2.GL_AMBIENT_AND_DIFFUSE, color, 0);
  		gl.glDrawArrays(GL2.GL_QUADS, 0, 4);
  		
  		// deactivate vertex arrays after drawing
@@ -126,6 +133,11 @@ public class Custom_Draw {
     			r = 0.95f;
     			g = 0.95f;
     			b = 0.8f;
+    		break;
+    		case 7:
+    			r = 0.58f;
+    			g = 0.86f;
+    			b = 0.95f;
     		break;
     		default:
     			r = 0;

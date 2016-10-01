@@ -189,4 +189,21 @@ public class Vector {
 	private int sgn(float num){
 		return (num<0)?-1:1;
 	}
+
+	public Vector getXZnormal() {
+		Vector normal = new Vector(-this.z,0,this.x);
+		normal.normalize();
+		return normal;
+	}
+
+	public Vector getYZnormal() {
+		Vector normal = new Vector(0,-this.z,this.y);
+		normal.normalize();
+		return normal;
+	}
+	
+	@Override
+	public String toString(){
+		return "["+this.x+", "+this.y+", "+this.z+"]";
+	}
 }
