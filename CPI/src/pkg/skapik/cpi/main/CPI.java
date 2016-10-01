@@ -69,6 +69,8 @@ public class CPI{
 	    height = h;
 		module_frame = frame;
 		dragging = false;
+		xml_reader = new XML_Reader();
+
 		cursorImg = new BufferedImage(16, 16, BufferedImage.TYPE_INT_ARGB);
 	    blankCursor = Toolkit.getDefaultToolkit().createCustomCursor((Image)cursorImg, new Point(0, 0), "blank cursor");
 	}
@@ -130,7 +132,19 @@ public class CPI{
 	    });
 	}
 
-	public void key_pressed(int code, int id) { // Kocka slapla na klavesnici
+	public void key_pressed(int code, int id) {
+		if(code == 67){
+			
+			xml_reader.Load_XML("./xml/PrikladFormaruRIB-Zapsal-iTWOcivil2016.cpixml");
+			renderer.set_materials(xml_reader.get_materials());
+			renderer.set_objects(xml_reader.get_object_tree());
+			System.err.println("Done");
+
+		}else if(code == 88){
+			
+		}else{
+			System.out.println("Key: "+code);
+		}
 		/*if(code == 87 || code == 83 || code == 65 || code == 68 || code == 32 || code == 17){
 			player.Controll(code, id);
 		}else if(code == 16){
