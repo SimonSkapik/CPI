@@ -5,14 +5,12 @@ import java.awt.event.KeyListener;
 
 import pkg.skapik.cpi.main.CPI;
 
-public class MyKeyListener implements KeyListener {
+public class Key_Listener implements KeyListener {
 	
 	private CPI module;
 	
-	public MyKeyListener(CPI module){
-		
+	public Key_Listener(CPI module){
 		this.module = module;
-		
 	}
 
 	@Override
