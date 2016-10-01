@@ -1,32 +1,15 @@
 package pkg.skapik.cpi.functions;
 
-import java.awt.Point;
-import java.awt.dnd.DragSourceMotionListener;
-import java.awt.image.BufferedImage;
-import java.awt.image.DataBufferByte;
-import java.awt.image.WritableRaster;
-import java.io.File;
-import java.io.IOException;
-import java.nio.FloatBuffer;
-import java.util.ArrayList;
-import java.util.ConcurrentModificationException;
-import java.util.Random;
-
 import javax.media.opengl.GL2;
 import javax.media.opengl.GLAutoDrawable;
-import javax.media.opengl.GLContext;
 import javax.media.opengl.GLEventListener;
-import javax.media.opengl.GLException;
 import javax.media.opengl.glu.GLU;
 
-import com.jogamp.common.nio.Buffers;
 import com.jogamp.opengl.util.gl2.GLUT;
-import com.jogamp.opengl.util.texture.Texture;
-import com.jogamp.opengl.util.texture.TextureData;
-import com.jogamp.opengl.util.texture.TextureIO;
-import com.jogamp.opengl.util.texture.awt.AWTTextureIO;
 
 import pkg.skapik.cpi.assets.Camera;
+import pkg.skapik.cpi.assets.Container;
+import pkg.skapik.cpi.assets.Materials;
 import pkg.skapik.cpi.assets.Skybox;
 import pkg.skapik.cpi.main.CPI;
 
@@ -41,26 +24,27 @@ public class Renderer implements GLEventListener  {
     public int height;
     private int frame_count;
     private Skybox skybox;
-    //public int crosshair;
+    public int list_grid;
 
-    /*private ArrayList<Creature> mobs;
-    private ArrayList<Creature> dead_mobs;
-    private ArrayList<Cloud> clouds;*/
-    
 	private CPI module;
 	private Camera cam;
-	
+	private Position cam_pos;
+	private Vector cam_dir;
+	private Materials materials;
+	private Container object_tree;
 
 	public Renderer(CPI module){
 		this.glu = new GLU();
 		this.glut = new GLUT();
 	    
 		this.module = module;
-		this.module.init();
+		this.module.init(this);
 		
 		this.cam = module.get_camera();
 	    this.width = module.width;
 	    this.height = module.height;
+	    this.materials = new Materials();
+	    this.object_tree = null;
 	    this.frame_count = 0;
 	}
 
@@ -100,7 +84,7 @@ public class Renderer implements GLEventListener  {
         gl.glDisable( GL2.GL_LIGHT5 );         // zapni zdroj svetla
         gl.glDisable( GL2.GL_LIGHT6 );         // zapni zdroj svetla
         gl.glDisable( GL2.GL_LIGHT7 );         // zapni zdroj svetla
-        gl.glEnable( GL2.GL_LIGHTING );         // zapni zdroj svetla
+        gl.glEnable( GL2.GL_LIGHTING );         // zapni osvetleni
         
         gl.glTexParameteri(GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE_MAX_LEVEL, 7);
         gl.glDisable(GL2.GL_TEXTURE_2D);
@@ -109,44 +93,8 @@ public class Renderer implements GLEventListener  {
         gl.glDisable(GL2.GL_FOG);
         gl.glDisable(GL2.GL_BLEND);
 
-        
-
-        
-        // list_start = gl.glGenLists(11);
-        // list_2 = list_start+1;
-        
-	    /*
-        gl.glNewList(list_start, GL2.GL_COMPILE );
-	    
-	    // activate and specify pointer to vertex array
- 		gl.glEnableClientState(GL2.GL_VERTEX_ARRAY);
- 		gl.glEnableClientState(GL2.GL_TEXTURE_COORD_ARRAY);
- 		gl.glEnable(GL2.GL_BLEND);
- 		
- 		FloatBuffer vertices;
-		vertices = Buffers.newDirectFloatBuffer(8);
-		vertices.put(-0.5f);
-		vertices.put(-0.5f);
-		vertices.put(-0.5f);
-		vertices.put(0.5f);
-		vertices.put(0.5f);
-		vertices.put(0.5f);
-		vertices.put(0.5f);
-		vertices.put(-0.5f);
-		vertices.rewind();
- 		gl.glVertexPointer(2, GL2.GL_FLOAT, 0, vertices);
- 		gl.glTexCoordPointer(2, GL2.GL_FLOAT, 0, main_coords_manager.get_texture_coords(Texture_List.HBAR_BG));
- 		// draw a cube
- 		gl.glMaterialfv(GL2.GL_FRONT_AND_BACK, GL2.GL_AMBIENT_AND_DIFFUSE, Custom_Draw.float_color("white"), 0);
- 		gl.glDrawArrays(GL2.GL_QUADS, 0, 4);
- 		
- 		// deactivate vertex arrays after drawing
- 		gl.glDisableClientState(GL2.GL_VERTEX_ARRAY);
- 		gl.glDisableClientState(GL2.GL_TEXTURE_COORD_ARRAY);
- 		gl.glDisable(GL2.GL_BLEND);
- 		
-	    gl.glEndList();
-	    */
+        list_grid = gl.glGenLists(1);
+        predraw_grid(400, 5);
         
         this.skybox = new Skybox(800,gl);
 	}
@@ -177,14 +125,14 @@ public class Renderer implements GLEventListener  {
         gl.glMatrixMode(GL2.GL_MODELVIEW);         						// bude se menit matice modelview
         gl.glLoadIdentity();											// vynulovani vsech predchozich transformaci
         
-        Position cam_pos = cam.get_position();
-        Vector cam_dir = new Vector(cam.get_view_direction());
+        cam_pos = cam.get_position();
+        cam_dir = new Vector(cam.get_view_direction());
         cam_dir.add(cam_pos);
         glu.gluLookAt(cam_pos.getX_D(), cam_pos.getY_D(), cam_pos.getZ_D(),
         		cam_dir.getX_D(), cam_dir.getY_D(), cam_dir.getZ_D(), 0, 1, 0); // postaveni kamery
 
-        float[] lightPosition = new float[] {1,1,1,0};
-        gl.glLightModelfv( GL2.GL_LIGHT_MODEL_AMBIENT, Custom_Draw.float_color(Custom_Draw.COLOR_RED), 0); // zakladni barva ambientniho a difuzniho osvetleni
+        float[] lightPosition = new float[] {1,0.9f,0.8f,0};
+        gl.glLightModelfv( GL2.GL_LIGHT_MODEL_AMBIENT, Custom_Draw.float_color(Custom_Draw.COLOR_LIGHT), 0); // zakladni barva ambientniho a difuzniho osvetleni
         gl.glLightfv(GL2.GL_LIGHT0, GL2.GL_POSITION, lightPosition,0);
         
         gl.glMaterialfv(GL2.GL_FRONT_AND_BACK, GL2.GL_AMBIENT_AND_DIFFUSE, Custom_Draw.float_color(Custom_Draw.COLOR_LIGHT), 0);
@@ -192,8 +140,6 @@ public class Renderer implements GLEventListener  {
        	
         
         /////// !!!!!!! A KRESLIIIIMEEEE !!!!!!!! \\\\\\\\
-        
-        gl.glTranslatef(cam.get_position().getX_F(), cam.get_position().getY_F(), cam.get_position().getZ_F());
         
         gl.glPushMatrix();
         gl.glTranslatef(-400.0f, -400.0f, -400.0f);
@@ -203,60 +149,70 @@ public class Renderer implements GLEventListener  {
         /*gl.glEnableClientState(GL2.GL_VERTEX_ARRAY);
  		gl.glEnableClientState(GL2.GL_TEXTURE_COORD_ARRAY);
  		gl.glEnableClientState(GL2.GL_NORMAL_ARRAY);
-*/
- 		
- 		
- 		// DRAW SCENE
- 		gl.glPushMatrix();
- 		//draw_cube(gl,5);
- 		gl.glTranslatef(0, 0, -4.0f);
- 		Custom_Draw.drawQuad(gl, 10);
+         */
+        
+        gl.glPushMatrix();
+        this.materials.set_material(gl, 703);
+ 		glut.glutSolidCube(5);
  		gl.glPopMatrix();
  		
- 		gl.glPushMatrix();
- 		gl.glTranslatef(0, 0, 4.0f);
- 		Custom_Draw.drawQuad(gl, 10);
- 		gl.glPopMatrix();
- 	
-
- 		gl.glPushMatrix();
- 		gl.glTranslatef(0, 4.0f, 0);
- 		Custom_Draw.drawQuad(gl, 10);
- 		gl.glPopMatrix();
-
- 		gl.glPushMatrix();
- 		gl.glTranslatef(0, -4.0f, 0);
- 		Custom_Draw.drawQuad(gl, 10);
- 		gl.glPopMatrix();
-
- 		gl.glPushMatrix();
- 		gl.glTranslatef(4.0f, 0, 0);
- 		Custom_Draw.drawQuad(gl, 10);
- 		gl.glPopMatrix();
-
- 		gl.glPushMatrix();
- 		gl.glTranslatef(-4.0f,0,0);
- 		Custom_Draw.drawQuad(gl, 10);
- 		gl.glPopMatrix();
+ 		gl.glCallList(list_grid);
  		
  		/*
     	gl.glDisableClientState(GL2.GL_VERTEX_ARRAY);
  		gl.glDisableClientState(GL2.GL_TEXTURE_COORD_ARRAY);
  		gl.glDisableClientState(GL2.GL_NORMAL_ARRAY);
     	*/
+ 		
     	cam.draw_HUD(gl, frame_count);
 	    	
 	    gl.glFlush();
 
-
     }
     
-    private void draw_cube(GL2 gl, int scale){
+    private void predraw_grid(int size, int spacing){
+    	float half = (size/2.0f);
+    	float m_half = (-1)*(size/2.0f);
     	
+    	gl.glNewList(list_grid, GL2.GL_COMPILE );
+    	
+    	gl.glLineWidth(0.05f);
+    	gl.glColor3f(0.0f, 0.0f, 0.0f);
+    	gl.glEnable(GL2.GL_BLEND);
+    	gl.glMaterialfv(GL2.GL_FRONT_AND_BACK, GL2.GL_AMBIENT_AND_DIFFUSE, Custom_Draw.float_color(Custom_Draw.COLOR_GREY, 0.8f), 0);
+    	gl.glBegin(GL2.GL_LINES);
+    	
+    	for(int i = (int)(m_half); i <= half;i += spacing){
+    		
+    		gl.glVertex3f(i, 0, m_half);
+    		gl.glVertex3f(i, 0, half);
+    		
+    		gl.glVertex3f(m_half, 0, i);
+    		gl.glVertex3f(half, 0, i);
+    		
+    	}
+    	
+    	gl.glEnd(); 
+    	gl.glDisable(GL2.GL_BLEND);
+		
+    	gl.glEndList();
+		
+    }
+    
+    public void set_materials(Materials mat){
+    	this.materials = mat;
     }
 
 	public int get_frame_count() {
 		return frame_count;
+	}
+
+	public void print_materials() {
+		System.out.print(this.materials.toString());
+	}
+
+	public void set_objects(Container get_object_tree) {
+		this.object_tree = get_object_tree;
 	}
 
 
