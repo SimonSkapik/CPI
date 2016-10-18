@@ -138,10 +138,9 @@ public class CPI{
 			xml_reader.Load_XML("./xml/PrikladFormaruRIB-Zapsal-iTWOcivil2016.cpixml");
 			renderer.set_materials(xml_reader.get_materials());
 			renderer.set_objects(xml_reader.get_object_tree());
-			System.err.println("Done");
 
-		}else if(code == 88){
-			
+		}else if(code == 86){
+			System.out.println(renderer.count_drawable());
 		}else{
 			System.out.println("Key: "+code);
 		}
@@ -195,12 +194,12 @@ public class CPI{
 		}else{
 			if(button == 1){
 				if(x != center.x || y != center.y){
-					camera.Rotate(x,y);
+					camera.Look(x,y);
 				}
 				robot_controller.mouseMove(center_on_screen.x,center_on_screen.y);
 			}else if(button == 2){
 				if(x != center.x || y != center.y){
-					camera.Look(x,y);
+					camera.Rotate(x,y);
 				}
 				robot_controller.mouseMove(center_on_screen.x,center_on_screen.y);
 			}else if(button == 3){

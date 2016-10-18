@@ -1,12 +1,5 @@
 package pkg.skapik.cpi.assets;
 
-import java.awt.Point;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
-
 import javax.media.opengl.GL2;
 
 import com.jogamp.opengl.util.gl2.GLUT;

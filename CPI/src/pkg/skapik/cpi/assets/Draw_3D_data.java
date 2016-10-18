@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 
+import javax.media.opengl.GL2;
+
 import com.jogamp.common.nio.Buffers;
 
 public abstract class Draw_3D_data {
@@ -15,7 +17,9 @@ public abstract class Draw_3D_data {
 	protected boolean compiled;
 	
 	public abstract void compile_indices();
-	public abstract void draw(); 
+	public abstract void draw(GL2 gl); 
+	public abstract boolean is_drawable();
+	
 	
 	public Draw_3D_data(){
 		this.vertices = null; 
@@ -46,6 +50,6 @@ public abstract class Draw_3D_data {
 		this.vertices.rewind();
 		//this.normals.rewind();
 	}
-	
+
 
 }

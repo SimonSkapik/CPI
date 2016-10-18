@@ -77,8 +77,13 @@ public class Renderer implements GLEventListener  {
         //gl.glLighti(GL2.GL_LIGHT1, GL2.GL_LIGHT, arg2);
         gl.glShadeModel(GL2.GL_SMOOTH);     // smooooooth prechody mezi vertex barvama
         gl.glEnable( GL2.GL_LIGHT0 );         // zapni zdroj svetla
-        gl.glEnable( GL2.GL_LIGHT1 );         // zapni zdroj svetla
+        gl.glDisable( GL2.GL_LIGHT1 );         // zapni zdroj svetla
         gl.glDisable( GL2.GL_LIGHT2 );         // zapni zdroj svetla
+        
+        gl.glLightfv(GL2.GL_LIGHT0, GL2.GL_SPECULAR, Custom_Draw.float_color(Custom_Draw.COLOR_LIGHT), 0);
+        gl.glLightfv(GL2.GL_LIGHT0, GL2.GL_AMBIENT, Custom_Draw.float_color(Custom_Draw.COLOR_LIGHT), 0);
+        gl.glLightfv(GL2.GL_LIGHT0, GL2.GL_DIFFUSE, Custom_Draw.float_color(Custom_Draw.COLOR_LIGHT), 0);
+        
         gl.glDisable( GL2.GL_LIGHT3 );         // zapni zdroj svetla
         gl.glDisable( GL2.GL_LIGHT4 );         // zapni zdroj svetla
         gl.glDisable( GL2.GL_LIGHT5 );         // zapni zdroj svetla
@@ -87,14 +92,15 @@ public class Renderer implements GLEventListener  {
         gl.glEnable( GL2.GL_LIGHTING );         // zapni osvetleni
         
         gl.glTexParameteri(GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE_MAX_LEVEL, 7);
-        gl.glDisable(GL2.GL_TEXTURE_2D);
         gl.glTexEnvi(GL2.GL_TEXTURE_ENV, GL2.GL_TEXTURE_ENV_MODE, GL2.GL_MODULATE);     // texture application method - modulation
+        gl.glDisable(GL2.GL_TEXTURE_2D);
+        //gl.glEnable(GL2.GL_COLOR_MATERIAL);
         
         gl.glDisable(GL2.GL_FOG);
         gl.glDisable(GL2.GL_BLEND);
 
         list_grid = gl.glGenLists(1);
-        predraw_grid(400, 5);
+        predraw_grid(800, 15);
         
         this.skybox = new Skybox(800,gl);
 	}
@@ -113,7 +119,7 @@ public class Renderer implements GLEventListener  {
         gl.glViewport(0, 0, width, height);
         gl.glMatrixMode(GL2.GL_PROJECTION);
         gl.glLoadIdentity();
-        glu.gluPerspective(80.0f, h, 0.01, 2000.0);
+        glu.gluPerspective(80.0f, h, 0.01, 800.0);
         gl.glMatrixMode(GL2.GL_MODELVIEW);
         gl.glLoadIdentity();
 	}
@@ -132,28 +138,42 @@ public class Renderer implements GLEventListener  {
         		cam_dir.getX_D(), cam_dir.getY_D(), cam_dir.getZ_D(), 0, 1, 0); // postaveni kamery
 
         float[] lightPosition = new float[] {1,0.9f,0.8f,0};
-        gl.glLightModelfv( GL2.GL_LIGHT_MODEL_AMBIENT, Custom_Draw.float_color(Custom_Draw.COLOR_LIGHT), 0); // zakladni barva ambientniho a difuzniho osvetleni
+        //gl.glLightModelfv( GL2.GL_LIGHT_MODEL_AMBIENT, Custom_Draw.float_color(Custom_Draw.COLOR_LIGHT), 0); // zakladni barva ambientniho a difuzniho osvetleni
+        
         gl.glLightfv(GL2.GL_LIGHT0, GL2.GL_POSITION, lightPosition,0);
         
-        gl.glMaterialfv(GL2.GL_FRONT_AND_BACK, GL2.GL_AMBIENT_AND_DIFFUSE, Custom_Draw.float_color(Custom_Draw.COLOR_LIGHT), 0);
-        gl.glMaterialfv(GL2.GL_FRONT_AND_BACK, GL2.GL_EMISSION, Custom_Draw.float_color(Custom_Draw.COLOR_BLACK), 0);
+        //gl.glMaterialfv(GL2.GL_FRONT_AND_BACK, GL2.GL_AMBIENT_AND_DIFFUSE, Custom_Draw.float_color(Custom_Draw.COLOR_LIGHT), 0);
+        //gl.glMaterialfv(GL2.GL_FRONT_AND_BACK, GL2.GL_EMISSION, Custom_Draw.float_color(Custom_Draw.COLOR_BLACK), 0);
        	
         
         /////// !!!!!!! A KRESLIIIIMEEEE !!!!!!!! \\\\\\\\
         
+        /*
         gl.glPushMatrix();
         gl.glTranslatef(-400.0f, -400.0f, -400.0f);
     	skybox.draw(gl,1);
         gl.glPopMatrix();
+        */
+        
         
         /*gl.glEnableClientState(GL2.GL_VERTEX_ARRAY);
  		gl.glEnableClientState(GL2.GL_TEXTURE_COORD_ARRAY);
  		gl.glEnableClientState(GL2.GL_NORMAL_ARRAY);
          */
         
+        
+        
         gl.glPushMatrix();
-        this.materials.set_material(gl, 703);
- 		glut.glutSolidCube(5);
+        
+        gl.glRotated(-90, 1, 0, 0);
+        
+        if(this.object_tree == null){
+        	glut.glutSolidCube(5);
+ 		}else{
+ 			gl.glEnableClientState(GL2.GL_VERTEX_ARRAY);
+ 			this.object_tree.draw(gl,materials);
+ 			gl.glDisableClientState(GL2.GL_VERTEX_ARRAY);
+ 		}
  		gl.glPopMatrix();
  		
  		gl.glCallList(list_grid);
@@ -213,6 +233,10 @@ public class Renderer implements GLEventListener  {
 
 	public void set_objects(Container get_object_tree) {
 		this.object_tree = get_object_tree;
+	}
+
+	public int count_drawable() {
+		return this.object_tree.count_drawable();
 	}
 
 

@@ -10,4 +10,15 @@ public class Triangle {
 		this.ind3 = i3;
 	}
 	
+	public int get_i1(){
+		return ind1;
+	}
+
+	public int get_i2(){
+		return ind2;
+	}
+	
+	public int get_i3(){
+		return ind3;
+	}
 }
