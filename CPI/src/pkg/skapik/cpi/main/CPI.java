@@ -96,7 +96,10 @@ public class CPI{
 	    //height = 762;// screenSize.height; //(int) screenSize.getHeight();
 	    
 	    // Nove okno
-	    canvas = new GLCanvas(new GLCapabilities(GLProfile.get(GLProfile.GL2)));
+	    GLCapabilities caps = new GLCapabilities(GLProfile.get(GLProfile.GL2));
+	    caps.setSampleBuffers(true);
+	    caps.setNumSamples(4);
+	    canvas = new GLCanvas(caps);
 	    frame = new JFrame("CPI Module");
 	    frame.setAlwaysOnTop(false);
 	    frame.setSize(screenSize.width, screenSize.height);
@@ -140,7 +143,15 @@ public class CPI{
 			renderer.set_objects(xml_reader.get_object_tree());
 
 		}else if(code == 86){
-			System.out.println(renderer.count_drawable());
+			renderer.toggle_wireframe();
+		}else if(code == 27){
+			String[] buttons = { "Ano", "Ne" };
+			int dialogResult = JOptionPane.showOptionDialog(null, "Ukončit aplikaci?", null, JOptionPane.YES_NO_OPTION,
+			        JOptionPane.QUESTION_MESSAGE, null, buttons, buttons[1]);
+			
+			if(dialogResult == JOptionPane.YES_OPTION){
+				System.exit(0);
+			}
 		}else{
 			System.out.println("Key: "+code);
 		}

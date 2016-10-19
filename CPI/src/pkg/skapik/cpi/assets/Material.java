@@ -2,6 +2,8 @@ package pkg.skapik.cpi.assets;
 
 import javax.media.opengl.GL2;
 
+import pkg.skapik.cpi.functions.Custom_Draw;
+
 public class Material {
 	
 	private float[] diffuse;
@@ -29,17 +31,18 @@ public class Material {
 		diffuse = diff.clone();
 		ambient = amb.clone();
 		specular = spec.clone();
-		diffuse[3] *= trans;
+		/*diffuse[3] *= trans;
 		ambient[3] *= trans;
-		specular[3] *= trans;
+		specular[3] *= trans;*/
 	}
 
 	public void set_material(GL2 gl) {
-		/*gl.glMaterialfv(GL2.GL_FRONT_AND_BACK, GL2.GL_SPECULAR, specular, 0);
-		gl.glMaterialfv(GL2.GL_FRONT_AND_BACK, GL2.GL_AMBIENT, diffuse, 0);
+		//gl.glMaterialfv(GL2.GL_FRONT_AND_BACK, GL2.GL_SPECULAR, specular, 0);
+		gl.glMaterialfv(GL2.GL_FRONT_AND_BACK, GL2.GL_SPECULAR, Custom_Draw.float_color(Custom_Draw.COLOR_BLACK), 0);
+		//gl.glMaterialfv(GL2.GL_FRONT_AND_BACK, GL2.GL_AMBIENT, ambient, 0);
 		gl.glMaterialfv(GL2.GL_FRONT_AND_BACK, GL2.GL_DIFFUSE, diffuse, 0);
-		gl.glMaterialfv(GL2.GL_FRONT_AND_BACK, GL2.GL_SHININESS, new float[]{0}, 0);*/
-		gl.glMaterialfv(GL2.GL_FRONT_AND_BACK, GL2.GL_AMBIENT_AND_DIFFUSE, diffuse, 0);
+		gl.glMaterialfv(GL2.GL_FRONT_AND_BACK, GL2.GL_SHININESS, new float[]{100}, 0);
+		//gl.glMaterialfv(GL2.GL_FRONT, GL2.GL_AMBIENT_AND_DIFFUSE, diffuse, 0);
 	}
 	
 	public void set_transparency(float trans){

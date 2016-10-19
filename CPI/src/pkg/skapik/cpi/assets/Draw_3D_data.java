@@ -11,8 +11,6 @@ import com.jogamp.common.nio.Buffers;
 
 public abstract class Draw_3D_data {
 	
-	public enum Type {CHAIN, POLYGON, SOLID};
-	protected Type type;
 	protected DoubleBuffer vertices;
 	protected boolean compiled;
 	
@@ -24,10 +22,6 @@ public abstract class Draw_3D_data {
 	public Draw_3D_data(){
 		this.vertices = null; 
 		this.compiled = false;
-	}
-	
-	public void set_type(Type t){
-		this.type = t;
 	}
 	
 	public void set_vertices(ArrayList<Vertex> vert){

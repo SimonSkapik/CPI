@@ -1,5 +1,7 @@
 package pkg.skapik.cpi.functions;
 
+import java.util.ArrayList;
+
 import javax.media.opengl.GL2;
 import javax.media.opengl.GLAutoDrawable;
 import javax.media.opengl.GLEventListener;
@@ -9,9 +11,16 @@ import com.jogamp.opengl.util.gl2.GLUT;
 
 import pkg.skapik.cpi.assets.Camera;
 import pkg.skapik.cpi.assets.Container;
+import pkg.skapik.cpi.assets.Draw_3D_Solid;
+import pkg.skapik.cpi.assets.Face;
 import pkg.skapik.cpi.assets.Materials;
+import pkg.skapik.cpi.assets.Object_3D;
+import pkg.skapik.cpi.assets.Object_data;
 import pkg.skapik.cpi.assets.Skybox;
+import pkg.skapik.cpi.assets.Triangle;
+import pkg.skapik.cpi.assets.Vertex;
 import pkg.skapik.cpi.main.CPI;
+import pkg.skapik.cpi.functions.Vector;
 
 
 public class Renderer implements GLEventListener  {
@@ -32,8 +41,17 @@ public class Renderer implements GLEventListener  {
 	private Vector cam_dir;
 	private Materials materials;
 	private Container object_tree;
+	
+	private Container test;
+	
+	private boolean use_aa;
+	private boolean wireframe;
+	
+	private final Vector y_axis = new Vector(0,1,0);
+    private final Vector z_axis = new Vector(0,0,1);
 
 	public Renderer(CPI module){
+		
 		this.glu = new GLU();
 		this.glut = new GLUT();
 	    
@@ -46,6 +64,35 @@ public class Renderer implements GLEventListener  {
 	    this.materials = new Materials();
 	    this.object_tree = null;
 	    this.frame_count = 0;
+	    
+	    this.use_aa = true;
+	    this.wireframe = false;
+	    
+	    Object_data data = new Object_data("testiiiing");
+	    Draw_3D_Solid data3d = new Draw_3D_Solid();
+	    ArrayList<Vertex> vert = new ArrayList<>();
+	    vert.add(new Vertex(0, 0, 4, 2));
+	    vert.add(new Vertex(1, 2, 4, 2));
+	    vert.add(new Vertex(2, 4, 6, 8));
+	    vert.add(new Vertex(3, 4, 4, 2));
+	    vert.add(new Vertex(4, 6, 6, 8));
+	    vert.add(new Vertex(5, 4, 1, 2));
+	    vert.add(new Vertex(6, 6, 3, 8));
+	    vert.add(new Vertex(7, 6, -1, 8));
+	    data3d.set_vertices(vert);
+	    Face f = new Face("Planar");
+	    f.add_triangle(new Triangle(0, 1, 2));
+	    f.add_triangle(new Triangle(1, 4, 2));
+	    f.add_triangle(new Triangle(1, 3, 4));
+	    f.add_triangle(new Triangle(3, 6, 4));
+	    f.add_triangle(new Triangle(3, 5, 6));
+	    f.add_triangle(new Triangle(5, 7, 6));
+	    data3d.add_face(f);
+	    data3d.compile_indices();
+	    data.add_draw_data(data3d);
+	    this.test = new Container(5000, "Test Object", new Object_data("Testing"));
+	    this.test.add_object(new Object_3D(5001, "Test 3D", 700, data));
+	    
 	}
 
 	@Override
@@ -75,32 +122,36 @@ public class Renderer implements GLEventListener  {
         //gl.glLightModelfv( GL2.GL_LIGHT_MODEL_AMBIENT, Custom_Draw.float_color("light"), 0); // zakladni barva ambientniho a difuzniho osvetleni
         gl.glLightfv(GL2.GL_LIGHT0, GL2.GL_POSITION, lightPosition,0);	//Position The Light
         //gl.glLighti(GL2.GL_LIGHT1, GL2.GL_LIGHT, arg2);
-        gl.glShadeModel(GL2.GL_SMOOTH);     // smooooooth prechody mezi vertex barvama
+        gl.glShadeModel(GL2.GL_FLAT);     // smooooooth prechody mezi vertex barvama
+        
+        gl.glLightfv(GL2.GL_LIGHT0, GL2.GL_SPECULAR, Custom_Draw.float_color(Custom_Draw.COLOR_WHITE), 0);
+        //gl.glLightfv(GL2.GL_LIGHT0, GL2.GL_AMBIENT, Custom_Draw.float_color(Custom_Draw.COLOR_WHITE), 0);
+        gl.glLightfv(GL2.GL_LIGHT0, GL2.GL_DIFFUSE, Custom_Draw.float_color(Custom_Draw.COLOR_WHITE), 0);
+        gl.glLightModelfv( GL2.GL_LIGHT_MODEL_AMBIENT, Custom_Draw.float_color(0.5,0.5,0.5,1), 0); // zakladni barva ambientniho a difuzniho osvetleni
+        
         gl.glEnable( GL2.GL_LIGHT0 );         // zapni zdroj svetla
-        gl.glDisable( GL2.GL_LIGHT1 );         // zapni zdroj svetla
-        gl.glDisable( GL2.GL_LIGHT2 );         // zapni zdroj svetla
+        gl.glDisable( GL2.GL_LIGHT1 );         // vypni zdroj svetla
+        gl.glDisable( GL2.GL_LIGHT2 );         // vypni zdroj svetla
         
-        gl.glLightfv(GL2.GL_LIGHT0, GL2.GL_SPECULAR, Custom_Draw.float_color(Custom_Draw.COLOR_LIGHT), 0);
-        gl.glLightfv(GL2.GL_LIGHT0, GL2.GL_AMBIENT, Custom_Draw.float_color(Custom_Draw.COLOR_LIGHT), 0);
-        gl.glLightfv(GL2.GL_LIGHT0, GL2.GL_DIFFUSE, Custom_Draw.float_color(Custom_Draw.COLOR_LIGHT), 0);
         
-        gl.glDisable( GL2.GL_LIGHT3 );         // zapni zdroj svetla
-        gl.glDisable( GL2.GL_LIGHT4 );         // zapni zdroj svetla
-        gl.glDisable( GL2.GL_LIGHT5 );         // zapni zdroj svetla
-        gl.glDisable( GL2.GL_LIGHT6 );         // zapni zdroj svetla
-        gl.glDisable( GL2.GL_LIGHT7 );         // zapni zdroj svetla
-        gl.glEnable( GL2.GL_LIGHTING );         // zapni osvetleni
+        gl.glDisable( GL2.GL_LIGHT3 );         // vypni zdroj svetla
+        gl.glDisable( GL2.GL_LIGHT4 );         // vypni zdroj svetla
+        gl.glDisable( GL2.GL_LIGHT5 );         // vypni zdroj svetla
+        gl.glDisable( GL2.GL_LIGHT6 );         // vypni zdroj svetla
+        gl.glDisable( GL2.GL_LIGHT7 );         // vypni zdroj svetla
+        gl.glEnable( GL2.GL_LIGHTING );         // vypni osvetleni
         
         gl.glTexParameteri(GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE_MAX_LEVEL, 7);
         gl.glTexEnvi(GL2.GL_TEXTURE_ENV, GL2.GL_TEXTURE_ENV_MODE, GL2.GL_MODULATE);     // texture application method - modulation
         gl.glDisable(GL2.GL_TEXTURE_2D);
+        //gl.glColorMaterial(GL2.GL_FRONT_AND_BACK, GL2.GL_AMBIENT_AND_DIFFUSE);
         //gl.glEnable(GL2.GL_COLOR_MATERIAL);
         
         gl.glDisable(GL2.GL_FOG);
         gl.glDisable(GL2.GL_BLEND);
-
+        
         list_grid = gl.glGenLists(1);
-        predraw_grid(800, 15);
+        predraw_grid(50, 0.5);
         
         this.skybox = new Skybox(800,gl);
 	}
@@ -119,7 +170,7 @@ public class Renderer implements GLEventListener  {
         gl.glViewport(0, 0, width, height);
         gl.glMatrixMode(GL2.GL_PROJECTION);
         gl.glLoadIdentity();
-        glu.gluPerspective(80.0f, h, 0.01, 800.0);
+        glu.gluPerspective(80.0f, h, 0.01, 300.0);
         gl.glMatrixMode(GL2.GL_MODELVIEW);
         gl.glLoadIdentity();
 	}
@@ -137,9 +188,15 @@ public class Renderer implements GLEventListener  {
         glu.gluLookAt(cam_pos.getX_D(), cam_pos.getY_D(), cam_pos.getZ_D(),
         		cam_dir.getX_D(), cam_dir.getY_D(), cam_dir.getZ_D(), 0, 1, 0); // postaveni kamery
 
-        float[] lightPosition = new float[] {1,0.9f,0.8f,0};
+        //float[] lightPosition = new float[] {1,0.9f,0.8f,0};
         //gl.glLightModelfv( GL2.GL_LIGHT_MODEL_AMBIENT, Custom_Draw.float_color(Custom_Draw.COLOR_LIGHT), 0); // zakladni barva ambientniho a difuzniho osvetleni
-        
+        Vector sun_rot = new Vector(cam.get_view_direction());
+        sun_rot.setY(0);
+        sun_rot.rotate(y_axis, -sun_rot.get_angle_to(z_axis));
+        sun_rot.normalize();
+        sun_rot.setY(1);
+        sun_rot.normalize();
+        float[] lightPosition = new float[] {sun_rot.getX_F(),sun_rot.getY_F(),sun_rot.getZ_F(),0};
         gl.glLightfv(GL2.GL_LIGHT0, GL2.GL_POSITION, lightPosition,0);
         
         //gl.glMaterialfv(GL2.GL_FRONT_AND_BACK, GL2.GL_AMBIENT_AND_DIFFUSE, Custom_Draw.float_color(Custom_Draw.COLOR_LIGHT), 0);
@@ -168,12 +225,41 @@ public class Renderer implements GLEventListener  {
         gl.glRotated(-90, 1, 0, 0);
         
         if(this.object_tree == null){
-        	glut.glutSolidCube(5);
+        	glut.glutSolidCube(3);
  		}else{
+ 			
  			gl.glEnableClientState(GL2.GL_VERTEX_ARRAY);
+ 			
+ 			if(use_aa){
+ 				gl.glEnable(GL2.GL_MULTISAMPLE);
+ 			}
+ 			
+ 			if(wireframe){
+ 				gl.glPolygonMode( GL2.GL_FRONT, GL2.GL_LINE );
+ 	 			gl.glLineWidth(0.1f);
+ 			}
+ 			
+ 			
  			this.object_tree.draw(gl,materials);
- 			gl.glDisableClientState(GL2.GL_VERTEX_ARRAY);
+
+ 			/*
+ 	    	gl.glColor3f(1.0f, 1.0f, 1.0f);
+ 	    	gl.glMaterialfv(GL2.GL_FRONT_AND_BACK, GL2.GL_AMBIENT_AND_DIFFUSE, Custom_Draw.float_color(Custom_Draw.COLOR_WHITE, 0.8f), 0);
+ 			this.object_tree.draw(gl,materials);*/
+
+ 			gl.glPolygonMode( GL2.GL_FRONT, GL2.GL_FILL );
+ 			gl.glDisableClientState(GL2.GL_NORMAL_ARRAY);
+ 			gl.glDisable(GL2.GL_MULTISAMPLE);
+ 			
  		}
+        if(use_aa)gl.glEnable(GL2.GL_MULTISAMPLE);
+		gl.glEnableClientState(GL2.GL_VERTEX_ARRAY);
+			
+		this.test.draw(gl,materials);
+
+		gl.glDisableClientState(GL2.GL_NORMAL_ARRAY);
+		gl.glDisable(GL2.GL_MULTISAMPLE);
+        
  		gl.glPopMatrix();
  		
  		gl.glCallList(list_grid);
@@ -190,9 +276,9 @@ public class Renderer implements GLEventListener  {
 
     }
     
-    private void predraw_grid(int size, int spacing){
-    	float half = (size/2.0f);
-    	float m_half = (-1)*(size/2.0f);
+    private void predraw_grid(int size, double grid_density){
+    	double half = (size/2.0);
+    	double m_half = (-1)*(size/2.0);
     	
     	gl.glNewList(list_grid, GL2.GL_COMPILE );
     	
@@ -202,13 +288,13 @@ public class Renderer implements GLEventListener  {
     	gl.glMaterialfv(GL2.GL_FRONT_AND_BACK, GL2.GL_AMBIENT_AND_DIFFUSE, Custom_Draw.float_color(Custom_Draw.COLOR_GREY, 0.8f), 0);
     	gl.glBegin(GL2.GL_LINES);
     	
-    	for(int i = (int)(m_half); i <= half;i += spacing){
+    	for(double i = (m_half); i <= half;i += grid_density){
     		
-    		gl.glVertex3f(i, 0, m_half);
-    		gl.glVertex3f(i, 0, half);
+    		gl.glVertex3d(i, 0, m_half);
+    		gl.glVertex3d(i, 0, half);
     		
-    		gl.glVertex3f(m_half, 0, i);
-    		gl.glVertex3f(half, 0, i);
+    		gl.glVertex3d(m_half, 0, i);
+    		gl.glVertex3d(half, 0, i);
     		
     	}
     	
@@ -237,6 +323,23 @@ public class Renderer implements GLEventListener  {
 
 	public int count_drawable() {
 		return this.object_tree.count_drawable();
+	}
+	
+	public void test_print(){
+		int buf[] = new int[1];
+	    int sbuf[] = new int[1];
+		gl.glGetIntegerv(GL2.GL_SAMPLE_BUFFERS, buf, 0);
+	    System.out.println("number of sample buffers is " + buf[0]);
+	    gl.glGetIntegerv(GL2.GL_SAMPLES, sbuf, 0);
+	    System.out.println("number of samples is " + sbuf[0]);
+	}
+
+	public void toggle_aa() {
+		this.use_aa = !this.use_aa;
+	}
+
+	public void toggle_wireframe() {
+		this.wireframe = !this.wireframe;
 	}
 
 

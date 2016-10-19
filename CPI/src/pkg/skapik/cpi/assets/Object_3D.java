@@ -1,5 +1,7 @@
 package pkg.skapik.cpi.assets;
 
+import java.util.Random;
+
 import javax.media.opengl.GL2;
 
 public class Object_3D {
@@ -17,8 +19,7 @@ public class Object_3D {
 	}
 
 	public void draw(GL2 gl, Materials materials) {
-		
-		if(this.data.get_draw_data() != null){
+		if(this.data.get_draw_data() != null && mat_id == 709 && id%3 == 0){
 			materials.set_material(gl, mat_id);
 			this.data.get_draw_data().draw(gl);
 		}

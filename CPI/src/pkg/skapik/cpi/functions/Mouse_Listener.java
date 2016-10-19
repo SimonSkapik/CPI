@@ -20,7 +20,7 @@ public class Mouse_Listener implements MouseListener, MouseMotionListener, Mouse
 	
 	@Override
 	public void mouseClicked(MouseEvent m) {
-		System.err.println(":"+m.getButton());
+
 	}
 
 	@Override

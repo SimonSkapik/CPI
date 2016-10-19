@@ -196,9 +196,9 @@ public class XML_Reader {
 					node_type = 0;
 				}else if(node_name.compareTo("p") == 0){ // Vertex
 					vertex_list.add(new Vertex(Integer.parseInt(nodeMap.getNamedItem("nr").getNodeValue()),
-												Double.parseDouble(nodeMap.getNamedItem("x").getNodeValue())/10.0,
-												Double.parseDouble(nodeMap.getNamedItem("y").getNodeValue())/10.0,
-												Double.parseDouble(nodeMap.getNamedItem("z").getNodeValue())/10.0));
+												Double.parseDouble(nodeMap.getNamedItem("x").getNodeValue())/100.0,
+												Double.parseDouble(nodeMap.getNamedItem("y").getNodeValue())/100.0,
+												Double.parseDouble(nodeMap.getNamedItem("z").getNodeValue())/100.0));
 				}else if(node_name.compareTo("pl") == 0){ // Chain object
 					
 					chain_3D_data = new Draw_3D_Chain();
@@ -293,7 +293,6 @@ public class XML_Reader {
 	}
 	
 	private void parse_polygon_face(Node node, Draw_3D_Polygon poly_3d_data, int id) {
-		String str = id+": ";
 		NodeList triangleList = node.getChildNodes();
 		NamedNodeMap nodeMap = node.getAttributes();
 		Face face = new Face(nodeMap.getNamedItem("shape").getNodeValue());
@@ -304,7 +303,6 @@ public class XML_Reader {
 		}
 
 		len = triangleList.getLength();
-		str += " len="+len;
 		for(int j = 0; j < len; j++){
 			if(triangleList.item(j).getNodeName().equals("t")){
 				nodeMap = triangleList.item(j).getAttributes();
@@ -317,7 +315,6 @@ public class XML_Reader {
 		
 		poly_3d_data.add_face(face);
 		poly_3d_data.compile_indices();
-		//System.out.println(str);
 	}
 
 	public Materials get_materials() {
