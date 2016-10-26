@@ -19,7 +19,7 @@ public class Object_3D {
 	}
 
 	public void draw(GL2 gl, Materials materials) {
-		if(this.data.get_draw_data() != null && mat_id == 709 && id%3 == 0){
+		if(this.data.get_draw_data() != null){
 			materials.set_material(gl, mat_id);
 			this.data.get_draw_data().draw(gl);
 		}

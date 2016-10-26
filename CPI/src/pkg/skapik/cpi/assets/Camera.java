@@ -22,9 +22,9 @@ public class Camera {
 	
 	public Camera(){
 		this.speed = 0.25f;
-		this.scroll_speed = 0.1f;
+		this.scroll_speed = 0.01f;
 		this.look_speed = 500;
-		this.move_speed = 0.005f;
+		this.move_speed = 0.001f;
 		this.old_x = -1;
 		this.old_y = -1;
 		this.glut = new GLUT();
