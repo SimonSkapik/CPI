@@ -3,24 +3,24 @@ package pkg.skapik.cpi.assets;
 public class Vertex {
 
 	private int id;
-	private double x,y,z;
+	private float x,y,z;
 	
-	public Vertex(int id, double x, double y, double z){
+	public Vertex(int id, float x, float y, float z){
 		this.id = id;
 		this.x = x;
 		this.y = y;
 		this.z = z;
 	}
 	
-	public double get_x(){
+	public float get_x(){
 		return this.x;
 	}
 
-	public double get_y(){
+	public float get_y(){
 		return this.y;
 	}
 
-	public double get_z(){
+	public float get_z(){
 		return this.z;
 	}
 

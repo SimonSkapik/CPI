@@ -1,6 +1,5 @@
 package pkg.skapik.cpi.assets;
 
-import java.awt.event.ContainerEvent;
 import java.util.ArrayList;
 
 import javax.media.opengl.GL2;
@@ -12,17 +11,22 @@ public class Container {
 	
 	private ArrayList<Container> children;
 	private ArrayList<Object_3D> objects;
+	private ArrayList<Container> composites;
+	private Object_3D composite_object;
 	private Object_data data;
 	private int[] vTrans;
-	private boolean composite;
+	private boolean is_composite;
+	private boolean has_composite;
 	
 	public Container(int id, String name, Object_data data){
 		this.id = id;
 		this.name = name;
 		this.vTrans = null;
-		this.composite = false;
+		this.is_composite = false;
+		this.has_composite = false;
 		this.children = new ArrayList<>();
 		this.objects = new ArrayList<>();
+		this.composites = new ArrayList<>();
 		this.data = data;
 	}
 	
@@ -31,7 +35,7 @@ public class Container {
 	}
 	
 	public void set_composite(boolean state){
-		composite = state;
+		is_composite = state;
 	}
 
 	public void add_container(Container container) {
@@ -60,5 +64,23 @@ public class Container {
 			count += O.count_drawable();
 		}
 		return count;
+	}
+
+	public void add_composite(Container con) {
+		this.has_composite = true;
+		con.set_composite(true);
+		this.composites.add(con);
+	}
+
+	public boolean has_composites() {
+		return this.has_composite;
+	}
+
+	public ArrayList<Container> get_containers() {
+		return this.children;
+	}
+
+	public ArrayList<Container> get_composites() {
+		return this.composites;
 	}
 }

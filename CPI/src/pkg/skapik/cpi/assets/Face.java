@@ -6,8 +6,6 @@ import java.util.ArrayList;
 
 import javax.media.opengl.GL2;
 
-import com.jogamp.common.nio.Buffers;
-
 import pkg.skapik.cpi.functions.Normal_calculator;
 import pkg.skapik.cpi.functions.Vector;
 
@@ -69,7 +67,14 @@ public class Face {
 		
 	}
 
-	public void compile_indices(DoubleBuffer vertices) {
+	/*public void compile_indices(DoubleBuffer vertices) {
+		this.vertices = Buffers.newDirectDoubleBuffer(this.triangles.size()*3);
+		for(Triangle T : this.triangles){
+			this.indices.put(T.get_i1());
+			this.indices.put(T.get_i2());
+			this.indices.put(T.get_i3());
+		}
+		/*
 		this.indices = Buffers.newDirectIntBuffer(triangle_count*3);
 		Vector normal;
 		int vertex_count = vertices.capacity()/3;
@@ -95,7 +100,7 @@ public class Face {
 			this.indices.put(T.get_i3());
 		}
 		this.indices.rewind();
-		this.normals.rewind();
-	}
+		this.normals.rewind();*/
+	//}
 	
 }

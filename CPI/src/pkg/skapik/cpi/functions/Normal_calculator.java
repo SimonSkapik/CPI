@@ -1,11 +1,11 @@
 package pkg.skapik.cpi.functions;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 public class Normal_calculator {
 	
 	public static Vector triangle_normal(double p1x, double p1y, double p1z, double p2x, double p2y, double p2z, double p3x, double p3y, double p3z){
+		//return new Vector(0,0,1);
 		return cross_product(new Vector(p2x-p1x, p2y-p1y, p2z-p1z), new Vector(p3x-p1x, p3y-p1y, p3z-p1z));
 	}
 	
@@ -18,7 +18,7 @@ public class Normal_calculator {
 	public static Vector average_vector(ArrayList<Vector> vector_list) {
 		double count = vector_list.size();
 		if(count == 0){
-			return new Vector(0,0,0);
+			return new Vector(0,0,1);
 		}
 		
 		ArrayList<Vector> filtered = new ArrayList<>();
@@ -26,14 +26,14 @@ public class Normal_calculator {
 			if(!contains_vector(filtered, V))
 				filtered.add(V);
 		}
-		if(vector_list.size() == filtered.size()){
+		/*if(vector_list.size() == filtered.size()){
 			System.out.print("same :-/");
 		}else if(vector_list.size() > filtered.size()){
 			System.err.print("reduced");
 		}else{
 			System.out.print("INCRESED???? WTF?????");
 		}
-		
+		*/
 		double x = 0;
 		double y = 0;
 		double z = 0;

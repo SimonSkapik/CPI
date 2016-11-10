@@ -7,21 +7,8 @@ import java.awt.event.MouseWheelEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.attribute.BasicFileAttributes;
-import java.nio.file.attribute.FileTime;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.awt.AWTException;
 import java.awt.Cursor;
-import java.awt.GraphicsEnvironment;
 import java.awt.Image;
 import java.awt.Point;
 import java.awt.Rectangle;
@@ -63,6 +50,7 @@ public class CPI{
     private Renderer renderer;
 	private boolean dragging;
 	private XML_Reader xml_reader;
+	private boolean shift_key;
     
 	public CPI(int w, int h, JFrame frame) {
 		width = w;
@@ -152,6 +140,12 @@ public class CPI{
 			if(dialogResult == JOptionPane.YES_OPTION){
 				System.exit(0);
 			}
+		}else if(code == 16){
+			this.shift_key = true;
+		}else if(code == 17){
+			Position pos =  this.camera.get_position();
+			Vector dir = this.camera.get_view_direction();
+			System.out.println("pos: ["+pos.getX_F()+", "+pos.getY_F()+", "+pos.getZ_F()+"]  dir: ["+dir.getX_F()+", "+dir.getY_F()+", "+dir.getZ_F()+"]");
 		}else{
 			System.out.println("Key: "+code);
 		}
@@ -193,6 +187,9 @@ public class CPI{
 		}else if(code == 16){
 			player.set_sneak(false);
 		}*/
+		 if(code == 16){
+			this.shift_key = false;
+		}
 	}
 
 	public void mouse_dragged(int button, int x, int y) {
@@ -215,7 +212,7 @@ public class CPI{
 				robot_controller.mouseMove(center_on_screen.x,center_on_screen.y);
 			}else if(button == 3){
 				if(x != center.x || y != center.y){
-					camera.Move(x,y);
+					camera.Move(x,y,this.shift_key);
 				}
 				robot_controller.mouseMove(center_on_screen.x,center_on_screen.y);
 			}
@@ -240,7 +237,7 @@ public class CPI{
 	}
 	
 	public void mouse_wheel_moved(MouseWheelEvent mwe) {
-		this.camera.Scroll(-mwe.getWheelRotation());
+		this.camera.Scroll(-mwe.getWheelRotation(), this.shift_key);
 	}
 
 }

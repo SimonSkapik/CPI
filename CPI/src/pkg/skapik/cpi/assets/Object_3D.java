@@ -1,7 +1,5 @@
 package pkg.skapik.cpi.assets;
 
-import java.util.Random;
-
 import javax.media.opengl.GL2;
 
 public class Object_3D {

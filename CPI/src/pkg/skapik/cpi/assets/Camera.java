@@ -19,12 +19,16 @@ public class Camera {
 	private float scroll_speed;
 	private float look_speed;
 	private float move_speed;
+	private float scroll_speed_precise;
+	private float move_speed_precise;
 	
 	public Camera(){
 		this.speed = 0.25f;
-		this.scroll_speed = 0.01f;
+		this.scroll_speed = 0.2f;
+		this.scroll_speed_precise = 0.01f;
 		this.look_speed = 500;
-		this.move_speed = 0.001f;
+		this.move_speed = 0.002f;
+		this.move_speed_precise = 0.0001f;
 		this.old_x = -1;
 		this.old_y = -1;
 		this.glut = new GLUT();
@@ -32,8 +36,8 @@ public class Camera {
 	}
 	
 	private void init(){
-		this.position = new Position(15,10,-1);
-		this.direction = new Vector(0,0,1);
+		this.position = new Position(2.46,5.26,-1.97);
+		this.direction = new Vector(-0.03,-0.44,-0.89);
 	}
 	
 	public void Controll(int key_code, int action) {
@@ -67,7 +71,7 @@ public class Camera {
 		}
 	}
 	
-	public void Move(int new_x, int new_y) {
+	public void Move(int new_x, int new_y, boolean precise) {
 		int d_x = (new_x - this.old_x);
 		int d_y = (new_y - this.old_y);
 		
@@ -75,8 +79,13 @@ public class Camera {
 		x_axis.normalize();
 		Vector y_axis = new Vector(0,1,0);
 		
-		this.position.move_by(x_axis, d_x*move_speed);
-		this.position.move_by(y_axis, d_y*move_speed);
+		if(precise){
+			this.position.move_by(x_axis, d_x*move_speed_precise);
+			this.position.move_by(y_axis, d_y*move_speed_precise);
+		}else{
+			this.position.move_by(x_axis, d_x*move_speed);
+			this.position.move_by(y_axis, d_y*move_speed);
+		}
 	}
 			
 	public void Rotate(int new_x, int new_y) {
@@ -98,8 +107,12 @@ public class Camera {
 		}
 	}
 	
-	public void Scroll(int wheelRotation) {		
-		this.position.move_by(direction, wheelRotation*scroll_speed);
+	public void Scroll(int wheelRotation, boolean precise) {
+		if(precise){
+			this.position.move_by(direction, wheelRotation*scroll_speed_precise);
+		}else{
+			this.position.move_by(direction, wheelRotation*scroll_speed);
+		}
 	}
 
 	public Position get_position(){

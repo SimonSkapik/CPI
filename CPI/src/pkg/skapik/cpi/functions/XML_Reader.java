@@ -56,6 +56,7 @@ public class XML_Reader {
 				load_materials();
 				load_object_tree();
 				load_3d_data();
+				//combine_composites();
 			}
 
 	    } catch (Exception e) {
@@ -151,7 +152,11 @@ public class XML_Reader {
 				nodeMap = nodeList.item(i).getAttributes();
 				node_id = Integer.parseInt(nodeMap.getNamedItem("ID").getNodeValue());
 				Container con = new Container(node_id, nodeMap.getNamedItem("name").getNodeValue(), object_list.get(node_id));
-				container.add_container(con);
+				//if(nodeMap.getNamedItem("composite").getNodeValue().equals("true")){
+				//	container.add_composite(con);
+				//}else{
+					container.add_container(con);
+				//}
 				load_object_tree_branch(con, nodeList.item(i));
 			}else if(nodeList.item(i).getNodeName() == "object3D"){
 				nodeMap = nodeList.item(i).getAttributes();
@@ -160,7 +165,7 @@ public class XML_Reader {
 			}
 		}
 	}
-	
+
 	private void load_3d_data(){
 		NodeList nodeList = doc.getElementsByTagName("data3D");
 		NodeList dataNodeList = null;
@@ -196,9 +201,9 @@ public class XML_Reader {
 					node_type = 0;
 				}else if(node_name.compareTo("p") == 0){ // Vertex
 					vertex_list.add(new Vertex(Integer.parseInt(nodeMap.getNamedItem("nr").getNodeValue()),
-												Double.parseDouble(nodeMap.getNamedItem("x").getNodeValue())/100.0,
-												Double.parseDouble(nodeMap.getNamedItem("y").getNodeValue())/100.0,
-												Double.parseDouble(nodeMap.getNamedItem("z").getNodeValue())/100.0));
+												Float.parseFloat(nodeMap.getNamedItem("x").getNodeValue())/100.0f,
+												Float.parseFloat(nodeMap.getNamedItem("y").getNodeValue())/100.0f,
+												Float.parseFloat(nodeMap.getNamedItem("z").getNodeValue())/100.0f));
 				}else if(node_name.compareTo("pl") == 0){ // Chain object
 					
 					chain_3D_data = new Draw_3D_Chain();
@@ -316,7 +321,26 @@ public class XML_Reader {
 		poly_3d_data.add_face(face);
 		poly_3d_data.compile_indices();
 	}
+	
+	private void combine_composites(){
+		combine_branch_composites(this.object_root);
+	}
+	
+	private void combine_branch_composites(Container con){
+		if(con.has_composites()){
+			for(Container C : con.get_composites()){
+				
+			}
+		}
+		for(Container C : con.get_containers()){
+			combine_branch_composites(C);
+		}
+	}
+	
+	
+	
 
+	
 	public Materials get_materials() {
 		if(this.materials != null)
 			return this.materials;

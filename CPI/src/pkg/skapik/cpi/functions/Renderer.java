@@ -119,14 +119,11 @@ public class Renderer implements GLEventListener  {
         gl.glEnable( GL2.GL_CULL_FACE );               // zadne hrany ani steny se nebudou odstranovat - zpomaluje, ale vykresli vzdy a vsechno
 
         float[] lightPosition = new float[] {1,1,1,0};
-        //gl.glLightModelfv( GL2.GL_LIGHT_MODEL_AMBIENT, Custom_Draw.float_color("light"), 0); // zakladni barva ambientniho a difuzniho osvetleni
         gl.glLightfv(GL2.GL_LIGHT0, GL2.GL_POSITION, lightPosition,0);	//Position The Light
-        //gl.glLighti(GL2.GL_LIGHT1, GL2.GL_LIGHT, arg2);
-        gl.glShadeModel(GL2.GL_FLAT);     // smooooooth prechody mezi vertex barvama
+        gl.glShadeModel(GL2.GL_SMOOTH);     // smooooooth prechody mezi vertex barvama
         
         gl.glLightfv(GL2.GL_LIGHT0, GL2.GL_SPECULAR, Custom_Draw.float_color(Custom_Draw.COLOR_WHITE), 0);
-        //gl.glLightfv(GL2.GL_LIGHT0, GL2.GL_AMBIENT, Custom_Draw.float_color(Custom_Draw.COLOR_WHITE), 0);
-        gl.glLightfv(GL2.GL_LIGHT0, GL2.GL_DIFFUSE, Custom_Draw.float_color(Custom_Draw.COLOR_WHITE), 0);
+        gl.glLightfv(GL2.GL_LIGHT0, GL2.GL_DIFFUSE, Custom_Draw.float_color(Custom_Draw.COLOR_LIGHT), 0);
         gl.glLightModelfv( GL2.GL_LIGHT_MODEL_AMBIENT, Custom_Draw.float_color(0.5,0.5,0.5,1), 0); // zakladni barva ambientniho a difuzniho osvetleni
         
         gl.glEnable( GL2.GL_LIGHT0 );         // zapni zdroj svetla
@@ -144,16 +141,19 @@ public class Renderer implements GLEventListener  {
         gl.glTexParameteri(GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE_MAX_LEVEL, 7);
         gl.glTexEnvi(GL2.GL_TEXTURE_ENV, GL2.GL_TEXTURE_ENV_MODE, GL2.GL_MODULATE);     // texture application method - modulation
         gl.glDisable(GL2.GL_TEXTURE_2D);
-        //gl.glColorMaterial(GL2.GL_FRONT_AND_BACK, GL2.GL_AMBIENT_AND_DIFFUSE);
-        //gl.glEnable(GL2.GL_COLOR_MATERIAL);
         
-        gl.glDisable(GL2.GL_FOG);
+        gl.glFogi(GL2.GL_FOG_MODE, GL2.GL_LINEAR);
+        gl.glFogfv(GL2.GL_FOG_COLOR, new float[]{0.7f, 0.8f, 0.9f,1.0f}, 0); 
+        gl.glHint(GL2.GL_FOG_HINT, GL2.GL_DONT_CARE);
+        gl.glFogf(GL2.GL_FOG_START, 25.0f); // Fog Start Depth 
+        gl.glFogf(GL2.GL_FOG_END, 30.0f); // Fog End Depth
+        gl.glEnable(GL2.GL_FOG);
         gl.glDisable(GL2.GL_BLEND);
         
         list_grid = gl.glGenLists(1);
-        predraw_grid(50, 0.5);
+        predraw_grid(30, 0.5);
         
-        this.skybox = new Skybox(800,gl);
+        this.skybox = new Skybox(150,gl);
 	}
 
 	@Override
@@ -170,7 +170,7 @@ public class Renderer implements GLEventListener  {
         gl.glViewport(0, 0, width, height);
         gl.glMatrixMode(GL2.GL_PROJECTION);
         gl.glLoadIdentity();
-        glu.gluPerspective(80.0f, h, 0.01, 300.0);
+        glu.gluPerspective(80.0f, h, 0.01, 350.0);
         gl.glMatrixMode(GL2.GL_MODELVIEW);
         gl.glLoadIdentity();
 	}
@@ -188,8 +188,6 @@ public class Renderer implements GLEventListener  {
         glu.gluLookAt(cam_pos.getX_D(), cam_pos.getY_D(), cam_pos.getZ_D(),
         		cam_dir.getX_D(), cam_dir.getY_D(), cam_dir.getZ_D(), 0, 1, 0); // postaveni kamery
 
-        //float[] lightPosition = new float[] {1,0.9f,0.8f,0};
-        //gl.glLightModelfv( GL2.GL_LIGHT_MODEL_AMBIENT, Custom_Draw.float_color(Custom_Draw.COLOR_LIGHT), 0); // zakladni barva ambientniho a difuzniho osvetleni
         Vector sun_rot = new Vector(cam.get_view_direction());
         sun_rot.setY(0);
         sun_rot.rotate(y_axis, -sun_rot.get_angle_to(z_axis));
@@ -199,27 +197,20 @@ public class Renderer implements GLEventListener  {
         float[] lightPosition = new float[] {sun_rot.getX_F(),sun_rot.getY_F(),sun_rot.getZ_F(),0};
         gl.glLightfv(GL2.GL_LIGHT0, GL2.GL_POSITION, lightPosition,0);
         
-        //gl.glMaterialfv(GL2.GL_FRONT_AND_BACK, GL2.GL_AMBIENT_AND_DIFFUSE, Custom_Draw.float_color(Custom_Draw.COLOR_LIGHT), 0);
-        //gl.glMaterialfv(GL2.GL_FRONT_AND_BACK, GL2.GL_EMISSION, Custom_Draw.float_color(Custom_Draw.COLOR_BLACK), 0);
-       	
-        
         /////// !!!!!!! A KRESLIIIIMEEEE !!!!!!!! \\\\\\\\
         
-        /*
         gl.glPushMatrix();
-        gl.glTranslatef(-400.0f, -400.0f, -400.0f);
+        gl.glTranslatef(cam_pos.getX_F(), cam_pos.getY_F(), cam_pos.getZ_F());
+        gl.glTranslatef(-75.0f, -75.0f, -75.0f);
     	skybox.draw(gl,1);
         gl.glPopMatrix();
-        */
-        
+
         
         /*gl.glEnableClientState(GL2.GL_VERTEX_ARRAY);
- 		gl.glEnableClientState(GL2.GL_TEXTURE_COORD_ARRAY);
  		gl.glEnableClientState(GL2.GL_NORMAL_ARRAY);
          */
         
-        
-        
+
         gl.glPushMatrix();
         
         gl.glRotated(-90, 1, 0, 0);
@@ -242,35 +233,17 @@ public class Renderer implements GLEventListener  {
  			
  			this.object_tree.draw(gl,materials);
 
- 			/*
- 	    	gl.glColor3f(1.0f, 1.0f, 1.0f);
- 	    	gl.glMaterialfv(GL2.GL_FRONT_AND_BACK, GL2.GL_AMBIENT_AND_DIFFUSE, Custom_Draw.float_color(Custom_Draw.COLOR_WHITE, 0.8f), 0);
- 			this.object_tree.draw(gl,materials);*/
-
  			gl.glPolygonMode( GL2.GL_FRONT, GL2.GL_FILL );
  			gl.glDisableClientState(GL2.GL_NORMAL_ARRAY);
  			gl.glDisable(GL2.GL_MULTISAMPLE);
  			
  		}
-        if(use_aa)gl.glEnable(GL2.GL_MULTISAMPLE);
-		gl.glEnableClientState(GL2.GL_VERTEX_ARRAY);
-			
-		this.test.draw(gl,materials);
 
-		gl.glDisableClientState(GL2.GL_NORMAL_ARRAY);
-		gl.glDisable(GL2.GL_MULTISAMPLE);
-        
- 		gl.glPopMatrix();
+        gl.glPopMatrix();
  		
  		gl.glCallList(list_grid);
  		
- 		/*
-    	gl.glDisableClientState(GL2.GL_VERTEX_ARRAY);
- 		gl.glDisableClientState(GL2.GL_TEXTURE_COORD_ARRAY);
- 		gl.glDisableClientState(GL2.GL_NORMAL_ARRAY);
-    	*/
- 		
-    	cam.draw_HUD(gl, frame_count);
+    	//cam.draw_HUD(gl, frame_count);
 	    	
 	    gl.glFlush();
 

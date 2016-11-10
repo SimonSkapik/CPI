@@ -1,9 +1,7 @@
 package pkg.skapik.cpi.assets;
 
-import java.nio.DoubleBuffer;
-import java.nio.IntBuffer;
+import java.nio.FloatBuffer;
 import java.util.ArrayList;
-import java.util.List;
 
 import javax.media.opengl.GL2;
 
@@ -16,14 +14,12 @@ public class Draw_3D_Solid extends Draw_3D_data {
 	
 	private ArrayList<Face> faces;
 	private int triangle_count;
-	private IntBuffer indices;
-	private DoubleBuffer normals;
+	private FloatBuffer normals;
 	
 	public Draw_3D_Solid(){
 		super();
 		faces = new ArrayList<>();
 		triangle_count = 0;
-		indices = null;
 	}
 	
 	public void add_face(Face f){
@@ -34,55 +30,58 @@ public class Draw_3D_Solid extends Draw_3D_data {
 	@Override
 	public void draw(GL2 gl){
 		if(this.vertices != null && this.compiled){
-			for(Face F : this.faces){
-				F.draw(gl, this.vertices);
-			}
-		}
-		/*
-			gl.glVertexPointer(3, GL2.GL_DOUBLE, 0, this.vertices);
+			gl.glVertexPointer(3, GL2.GL_FLOAT, 0, this.vertices);
 			gl.glEnableClientState(GL2.GL_NORMAL_ARRAY);
-			gl.glNormalPointer(GL2.GL_DOUBLE, 0, this.normals);
-			gl.glDrawElements(GL2.GL_TRIANGLES, triangle_count*3, GL2.GL_UNSIGNED_INT, indices);
+			gl.glNormalPointer(GL2.GL_FLOAT, 0, this.normals);
+			gl.glDrawArrays(GL2.GL_TRIANGLES, 0, triangle_count*3);
 			gl.glDisableClientState(GL2.GL_NORMAL_ARRAY);
-		*/
+		}
 	}
 
 	@Override
 	public void compile_indices() {
-		
+		Vertex v1 = null;
+		Vertex v2 = null;
+		Vertex v3 = null;
+		Vector normal = null;
+		this.vertices = Buffers.newDirectFloatBuffer(this.triangle_count*9);
+		this.normals = Buffers.newDirectFloatBuffer(this.triangle_count*9);
 		for(Face F : this.faces){
-			F.compile_indices(this.vertices);
-		}
-		
-		/*
-		Vector normal;
-		int vertex_count = this.vertices.capacity()/3;
-		this.normals = Buffers.newDirectDoubleBuffer(vertex_count*3);
-		this.indices = Buffers.newDirectIntBuffer(triangle_count*3);
-		ArrayList<Vector>[] normal_group_list = new ArrayList[vertex_count];
-		for(int i = 0; i < vertex_count; i++){
-			normal_group_list[i] = new ArrayList<>();
-		}
-		
-		for(Face F : this.faces){
-			F.get_normals(this.vertices, normal_group_list);
 			for(Triangle T : F.get_triangles()){
-				this.indices.put(T.get_i1());
-				this.indices.put(T.get_i2());
-				this.indices.put(T.get_i3());
+				v1 = this.vertex_list.get(T.get_i1());
+				v2 = this.vertex_list.get(T.get_i2());
+				v3 = this.vertex_list.get(T.get_i3());
+				normal = Normal_calculator.triangle_normal(v1.get_x(), v1.get_y(), v1.get_z(), v2.get_x(), v2.get_y(), v2.get_z(), v3.get_x(), v3.get_y(), v3.get_z());
+				normal.normalize();
+				this.vertices.put( v1.get_x() );
+				this.vertices.put( v1.get_y() );
+				this.vertices.put( v1.get_z() );
+				
+				this.vertices.put( v2.get_x() );
+				this.vertices.put( v2.get_y() );
+				this.vertices.put( v2.get_z() );
+				
+				this.vertices.put( v3.get_x() );
+				this.vertices.put( v3.get_y() );
+				this.vertices.put( v3.get_z() );
+				
+				this.normals.put( normal.getX_F() );
+				this.normals.put( normal.getY_F() );
+				this.normals.put( normal.getZ_F() );
+				
+				this.normals.put( normal.getX_F() );
+				this.normals.put( normal.getY_F() );
+				this.normals.put( normal.getZ_F() );
+				
+				this.normals.put( normal.getX_F() );
+				this.normals.put( normal.getY_F() );
+				this.normals.put( normal.getZ_F() );
 			}
 		}
 		
-		for(int i = 0; i < normal_group_list.length; i++){
-			normal = Normal_calculator.average_vector(normal_group_list[i]);
-			normal.normalize();
-			normals.put(normal.getX_D());
-			normals.put(normal.getY_D());
-			normals.put(normal.getZ_D());
-		}
-		
+		this.vertices.rewind();
 		this.normals.rewind();
-		this.indices.rewind();*/
+
 		this.compiled = true;
 	}
 

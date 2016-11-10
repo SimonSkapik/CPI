@@ -1,17 +1,17 @@
 package pkg.skapik.cpi.assets;
 
-import java.nio.DoubleBuffer;
+import java.nio.FloatBuffer;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 
 import javax.media.opengl.GL2;
 
-import com.jogamp.common.nio.Buffers;
 
 public abstract class Draw_3D_data {
 	
-	protected DoubleBuffer vertices;
+	protected FloatBuffer vertices;
+	protected ArrayList<Vertex> vertex_list;
 	protected boolean compiled;
 	
 	public abstract void compile_indices();
@@ -21,6 +21,7 @@ public abstract class Draw_3D_data {
 	
 	public Draw_3D_data(){
 		this.vertices = null; 
+		this.vertex_list = new ArrayList<>();
 		this.compiled = false;
 	}
 	
@@ -31,6 +32,7 @@ public abstract class Draw_3D_data {
 		        return v1.get_id() - v2.get_id();
 		    }
 		});
+		/*
 		this.vertices = Buffers.newDirectDoubleBuffer(vert.size()*3);
 		//this.normals = Buffers.newDirectFloatBuffer(faces_to_draw*12);
 
@@ -41,7 +43,8 @@ public abstract class Draw_3D_data {
 			//this.normals.put(norm[i*3+(j%3)]);
 		}
 		
-		this.vertices.rewind();
+		this.vertices.rewind();*/
+		this.vertex_list = vert;
 		//this.normals.rewind();
 	}
 
