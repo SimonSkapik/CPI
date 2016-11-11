@@ -1,6 +1,7 @@
 package pkg.skapik.cpi.functions;
 
 import java.io.File;
+import java.nio.FloatBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -13,6 +14,8 @@ import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+
+import com.jogamp.common.nio.Buffers;
 
 import pkg.skapik.cpi.assets.Container;
 import pkg.skapik.cpi.assets.Draw_3D_Chain;
@@ -56,7 +59,7 @@ public class XML_Reader {
 				load_materials();
 				load_object_tree();
 				load_3d_data();
-				//combine_composites();
+				combine_composites();
 			}
 
 	    } catch (Exception e) {
@@ -152,11 +155,15 @@ public class XML_Reader {
 				nodeMap = nodeList.item(i).getAttributes();
 				node_id = Integer.parseInt(nodeMap.getNamedItem("ID").getNodeValue());
 				Container con = new Container(node_id, nodeMap.getNamedItem("name").getNodeValue(), object_list.get(node_id));
-				//if(nodeMap.getNamedItem("composite").getNodeValue().equals("true")){
-				//	container.add_composite(con);
-				//}else{
+				try {
+					if(nodeMap.getNamedItem("composite").getNodeValue().compareTo("true") == 0){
+						container.add_composite(con);
+					}else{
+						container.add_container(con);
+					}
+				} catch (NullPointerException e) {
 					container.add_container(con);
-				//}
+				}
 				load_object_tree_branch(con, nodeList.item(i));
 			}else if(nodeList.item(i).getNodeName() == "object3D"){
 				nodeMap = nodeList.item(i).getAttributes();
@@ -328,16 +335,83 @@ public class XML_Reader {
 	
 	private void combine_branch_composites(Container con){
 		if(con.has_composites()){
+			int vert_count = 0;
+			ArrayList<Vertex> vert_list = new ArrayList<>();
+			ArrayList<Face> face_list = new ArrayList<>();
+			
 			for(Container C : con.get_composites()){
-				
+				for(Object_3D O : C.get_objects()){
+					vert_count += O.get_vertex_count();
+				}
 			}
+			
+			Vertex v1 = null;
+			Vertex v2 = null;
+			Vertex v3 = null;
+			Vector normal = null;
+			FloatBuffer vertices = Buffers.newDirectFloatBuffer(vert_count*3);
+			FloatBuffer normals = Buffers.newDirectFloatBuffer(vert_count*3);
+			
+			for(Container C : con.get_composites()){
+				for(Object_3D O : C.get_objects()){
+					vert_list = O.get_vertices();
+					face_list = O.get_faces();
+					if(vert_list != null && face_list != null){
+						for(Face F : face_list){
+							for(Triangle T : F.get_triangles()){
+								v1 = vert_list.get(T.get_i1());
+								v2 = vert_list.get(T.get_i2());
+								v3 = vert_list.get(T.get_i3());
+								normal = Normal_calculator.triangle_normal(v1.get_x(), v1.get_y(), v1.get_z(), v2.get_x(), v2.get_y(), v2.get_z(), v3.get_x(), v3.get_y(), v3.get_z());
+								normal.normalize();
+								vertices.put( v1.get_x() );
+								vertices.put( v1.get_y() );
+								vertices.put( v1.get_z() );
+								
+								vertices.put( v2.get_x() );
+								vertices.put( v2.get_y() );
+								vertices.put( v2.get_z() );
+								
+								vertices.put( v3.get_x() );
+								vertices.put( v3.get_y() );
+								vertices.put( v3.get_z() );
+								
+								normals.put( normal.getX_F() );
+								normals.put( normal.getY_F() );
+								normals.put( normal.getZ_F() );
+								
+								normals.put( normal.getX_F() );
+								normals.put( normal.getY_F() );
+								normals.put( normal.getZ_F() );
+								
+								normals.put( normal.getX_F() );
+								normals.put( normal.getY_F() );
+								normals.put( normal.getZ_F() );
+							}
+						}
+					}
+				}
+			}
+			
+			vertices.rewind();
+			normals.rewind();
+			
+			Object_data data = new Object_data("comosite data");
+			Draw_3D_Solid data_3d = new Draw_3D_Solid();
+			data_3d.set_vertex_buffer(vertices);
+			data_3d.set_normal_buffer(normals);
+			data_3d.set_triangle_count(vert_count/3);
+			data_3d.set_compiled(true);
+			data.add_draw_data(data_3d);
+			Object_3D comp_obj = new Object_3D(100000, "composite obj", con.get_composites().get(0).get_objects().get(0).get_material(), data);
+			con.add_composite_object(comp_obj);
 		}
+		
 		for(Container C : con.get_containers()){
 			combine_branch_composites(C);
 		}
 	}
-	
-	
+
 	
 
 	

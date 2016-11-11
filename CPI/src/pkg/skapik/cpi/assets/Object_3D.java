@@ -1,5 +1,7 @@
 package pkg.skapik.cpi.assets;
 
+import java.util.ArrayList;
+
 import javax.media.opengl.GL2;
 
 public class Object_3D {
@@ -29,6 +31,22 @@ public class Object_3D {
 			return 1;
 		}
 		return 0;
+	}
+
+	public ArrayList<Vertex> get_vertices() {
+		return this.data.get_draw_data().get_vertex_list();
+	}
+
+	public ArrayList<Face> get_faces() {
+		return this.data.get_draw_data().get_faces();
+	}
+
+	public int get_vertex_count() {
+		return this.data.get_draw_data().get_vertex_count();
+	}
+
+	public int get_material() {
+		return this.mat_id;
 	}
 	
 }

@@ -53,6 +53,9 @@ public class Container {
 		for(Object_3D O : this.objects){
 			O.draw(gl, materials);
 		}
+		if(has_composite && this.composite_object != null){
+			this.composite_object.draw(gl, materials);
+		}
 	}
 
 	public int count_drawable() {
@@ -82,5 +85,13 @@ public class Container {
 
 	public ArrayList<Container> get_composites() {
 		return this.composites;
+	}
+ 
+	public ArrayList<Object_3D> get_objects() {
+		return this.objects;
+	}
+
+	public void add_composite_object(Object_3D comp_obj) {
+		this.composite_object = comp_obj;
 	}
 }

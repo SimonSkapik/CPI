@@ -1,6 +1,7 @@
 package pkg.skapik.cpi.assets;
 
 import java.nio.FloatBuffer;
+import java.util.ArrayList;
 
 import javax.media.opengl.GL2;
 
@@ -89,6 +90,23 @@ public class Draw_3D_Polygon extends Draw_3D_data {
 			return true;
 		}
 		return false;
+	}
+
+	@Override
+	public ArrayList<Vertex> get_vertex_list() {
+		return this.vertex_list;
+	}
+
+	@Override
+	public ArrayList<Face> get_faces() {
+		ArrayList<Face> arr = new ArrayList<>();
+		arr.add(this.face);
+		return arr;
+	}
+	
+	@Override
+	public int get_vertex_count() {
+		return this.triangle_count*3;
 	}
 	
 }

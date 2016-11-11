@@ -1,5 +1,6 @@
 package pkg.skapik.cpi.assets;
 
+import java.beans.FeatureDescriptor;
 import java.nio.FloatBuffer;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -17,6 +18,9 @@ public abstract class Draw_3D_data {
 	public abstract void compile_indices();
 	public abstract void draw(GL2 gl); 
 	public abstract boolean is_drawable();
+	public abstract ArrayList<Vertex> get_vertex_list();
+	public abstract ArrayList<Face> get_faces();
+	public abstract int get_vertex_count();
 	
 	
 	public Draw_3D_data(){

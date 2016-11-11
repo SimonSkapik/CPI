@@ -92,5 +92,36 @@ public class Draw_3D_Solid extends Draw_3D_data {
 		}
 		return false;
 	}
+
+	@Override
+	public ArrayList<Vertex> get_vertex_list() {
+		return this.vertex_list;
+	}
+
+	@Override
+	public ArrayList<Face> get_faces() {
+		return this.faces;
+	}
+
+	@Override
+	public int get_vertex_count() {
+		return this.triangle_count*3;
+	}
+
+	public void set_vertex_buffer(FloatBuffer vertices) {
+		this.vertices = vertices;
+	}
+
+	public void set_normal_buffer(FloatBuffer normals) {
+		this.normals = normals;
+	}
+
+	public void set_compiled(boolean b) {
+		this.compiled = b;
+	}
+
+	public void set_triangle_count(int i) {
+		this.triangle_count = i;
+	}
 	
 }

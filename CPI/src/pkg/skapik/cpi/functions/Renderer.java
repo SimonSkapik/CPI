@@ -230,7 +230,6 @@ public class Renderer implements GLEventListener  {
  	 			gl.glLineWidth(0.1f);
  			}
  			
- 			
  			this.object_tree.draw(gl,materials);
 
  			gl.glPolygonMode( GL2.GL_FRONT, GL2.GL_FILL );
